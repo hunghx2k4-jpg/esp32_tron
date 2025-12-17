@@ -18,10 +18,9 @@
         .tank-label { font-weight: bold; color: #34495e; }
 
         /* Nút bấm */
-        .controls { margin-bottom: 30px; display: flex; justify-content: center; gap: 10px; }
-        .btn { padding: 12px 20px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 13px; }
+        .controls { margin-bottom: 30px; display: flex; justify-content: center; gap: 15px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 13px; min-width: 150px; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); opacity: 0.9; }
-        .btn-mix { background: var(--red); }
         .btn-excel { background: var(--green); }
         .btn-clear { background: var(--yellow); }
 
@@ -53,9 +52,8 @@
     </div>
 
     <div class="controls">
-        <button class="btn btn-mix" onclick="mix()">KÍCH HOẠT TRỘN</button>
-        <button class="btn btn-excel" onclick="exportExcel()">XUẤT EXCEL</button>
-        <button class="btn btn-clear" onclick="clearData()">XÓA LỊCH SỬ</button>
+        <button class="btn btn-excel" onclick="exportExcel()">XUẤT BÁO CÁO EXCEL</button>
+        <button class="btn btn-clear" onclick="clearData()">XÓA LỊCH SỬ TRỘN</button>
     </div>
 
     <table>
@@ -88,7 +86,7 @@
         document.getElementById('wC').style.height = d.levelC + '%'; document.getElementById('tC').innerText = d.levelC;
     });
 
-    // 2. Lấy lịch sử và xử lý thời gian thông minh
+    // 2. Lấy lịch sử và xử lý thời gian
     db.ref('lich_su_tron').on('value', s => {
         const data = s.val();
         const tbody = document.getElementById('history');
@@ -100,19 +98,15 @@
             const item = data[id];
             let timeDisplay = "";
 
-            // LOGIC XỬ LÝ THỜI GIAN THÔNG MINH
             if (typeof item.thoi_gian === 'string' && item.thoi_gian.includes('/')) {
-                // Nếu là dạng chuỗi "18/12/2025..." gửi từ ESP32
                 timeDisplay = item.thoi_gian;
             } else if (typeof item.thoi_gian === 'number' || !isNaN(item.thoi_gian)) {
-                // Nếu là dạng số Unix timestamp
                 const d = new Date(item.thoi_gian * 1000);
                 timeDisplay = d.toLocaleString('vi-VN');
             } else {
                 timeDisplay = "Không rõ thời gian";
             }
 
-            // Chặn các ngày lỗi 1970
             if (timeDisplay.includes("1970")) timeDisplay = "Lỗi đồng bộ mạch";
 
             logs.push({ "Thời gian": timeDisplay, "A": item.binh_A_percent, "B": item.binh_B_percent });
@@ -120,9 +114,13 @@
         });
     });
 
-    function mix() { db.ref('dieu_khien').update({ lenh_tron: 1 }); alert("Đã gửi lệnh!"); }
-    function clearData() { if(confirm("Xóa sạch lịch sử?")) db.ref('lich_su_tron').remove(); }
+    function clearData() { if(confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử trộn không?")) db.ref('lich_su_tron').remove(); }
+    
     function exportExcel() {
+        if (logs.length === 0) {
+            alert("Không có dữ liệu để xuất!");
+            return;
+        }
         const ws = XLSX.utils.json_to_sheet(logs);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Lịch sử");
