@@ -2,61 +2,60 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Giám Sát Trạm Trộn</title>
+    <title>GIÁM SÁT & ĐIỀU KHIỂN TRẠM TRỘN IOT</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        :root { --primary: #3498db; --secondary: #2ecc71; --danger: #e74c3c; --warning: #f39c12; --dark: #2c3e50; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: var(--dark); }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        :root { --blue: #3498db; --orange: #e67e22; --green: #2ecc71; --red: #e74c3c; --yellow: #f39c12; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; width: 100%; max-width: 900px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
+        h2 { color: #2c3e50; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 1px; }
         
-        /* Tank UI */
-        .tank-area { display: flex; justify-content: space-around; margin: 30px 0; flex-wrap: wrap; }
-        .tank-box { text-align: center; margin-bottom: 20px; }
-        .tank { width: 100px; height: 200px; border: 4px solid var(--dark); position: relative; background: #eee; border-radius: 0 0 10px 10px; overflow: hidden; margin-bottom: 10px; }
-        .water { position: absolute; bottom: 0; width: 100%; transition: height 1.5s ease-in-out; }
-        
-        /* Buttons */
-        .btn-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
-        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; color: white; display: flex; align-items: center; gap: 8px; }
-        .btn-start { background: var(--danger); }
-        .btn-excel { background: var(--secondary); }
-        .btn-clear { background: var(--warning); }
-        .btn:hover { opacity: 0.85; transform: translateY(-2px); }
-        .btn:active { transform: translateY(0); }
+        /* Giao diện Bể nước */
+        .tanks { display: flex; justify-content: space-around; margin-bottom: 40px; }
+        .tank-item { width: 150px; }
+        .tank-body { height: 220px; width: 110px; border: 3px solid #34495e; border-radius: 0 0 12px 12px; position: relative; margin: 0 auto 10px; background: #eee; overflow: hidden; }
+        .water { position: absolute; bottom: 0; width: 100%; height: 0%; transition: height 1s ease-in-out; }
+        .tank-label { font-weight: bold; color: #34495e; }
 
-        /* Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        th, td { padding: 12px; border: 1px solid #eee; text-align: center; }
-        th { background: var(--primary); color: white; }
-        tr:nth-child(even) { background-color: #fafafa; }
-        .status { padding: 4px 10px; border-radius: 15px; background: #dff9fb; color: #130f40; font-size: 12px; font-weight: bold; }
+        /* Nút bấm */
+        .controls { margin-bottom: 30px; display: flex; justify-content: center; gap: 10px; }
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 13px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); opacity: 0.9; }
+        .btn-mix { background: var(--red); }
+        .btn-excel { background: var(--green); }
+        .btn-clear { background: var(--yellow); }
+
+        /* Bảng */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: var(--blue); color: white; padding: 12px; font-size: 14px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; color: #555; }
+        .status { background: #e8f6f3; color: #16a085; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align:center;">GIÁM SÁT & ĐIỀU KHIỂN TRẠM TRỘN IOT</h2>
-    
-    <div class="tank-area">
-        <div class="tank-box">
-            <div class="tank"><div id="wA" class="water" style="height:0%; background: #3498db;"></div></div>
-            <strong>Bể A: <span id="vA">0</span>%</strong>
+    <h2>GIÁM SÁT & ĐIỀU KHIỂN TRẠM TRỘN IOT</h2>
+
+    <div class="tanks">
+        <div class="tank-item">
+            <div class="tank-body"><div id="wA" class="water" style="background: var(--blue);"></div></div>
+            <div class="tank-label">Bể A: <span id="tA">0</span>%</div>
         </div>
-        <div class="tank-box">
-            <div class="tank"><div id="wB" class="water" style="height:0%; background: #e67e22;"></div></div>
-            <strong>Bể B: <span id="vB">0</span>%</strong>
+        <div class="tank-item">
+            <div class="tank-body"><div id="wB" class="water" style="background: var(--orange);"></div></div>
+            <div class="tank-label">Bể B: <span id="tB">0</span>%</div>
         </div>
-        <div class="tank-box">
-            <div class="tank"><div id="wC" class="water" style="height:0%; background: #2ecc71;"></div></div>
-            <strong>Bể Tổng: <span id="vC">0</span>%</strong>
+        <div class="tank-item">
+            <div class="tank-body"><div id="wC" class="water" style="background: var(--green);"></div></div>
+            <div class="tank-label">Bể Tổng: <span id="tC">0</span>%</div>
         </div>
     </div>
 
-    <div class="btn-group">
-        <button class="btn btn-start" onclick="remoteMix()">KÍCH HOẠT TRỘN</button>
-        <button class="btn btn-excel" onclick="exportData()">XUẤT EXCEL</button>
-        <button class="btn btn-clear" onclick="clearHistory()">XÓA LỊCH SỬ</button>
+    <div class="controls">
+        <button class="btn btn-mix" onclick="mix()">KÍCH HOẠT TRỘN</button>
+        <button class="btn btn-excel" onclick="exportExcel()">XUẤT EXCEL</button>
+        <button class="btn btn-clear" onclick="clearData()">XÓA LỊCH SỬ</button>
     </div>
 
     <table>
@@ -68,84 +67,66 @@
                 <th>Trạng thái</th>
             </tr>
         </thead>
-        <tbody id="log-body">
-            <tr><td colspan="4">Đang kết nối dữ liệu...</td></tr>
-        </tbody>
+        <tbody id="history"></tbody>
     </table>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script>
-    // Cấu hình Firebase
-    const config = { databaseURL: "https://test-2f3ed-default-rtdb.asia-southeast1.firebasedatabase.app" };
-    firebase.initializeApp(config);
-    const db = firebase.database();
-    let excelData = [];
 
-    // 1. Lấy mực nước Realtime
+<script>
+    const firebaseConfig = { databaseURL: "https://test-2f3ed-default-rtdb.asia-southeast1.firebasedatabase.app" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let logs = [];
+
+    // 1. Lấy dữ liệu mực nước realtime
     db.ref('trang_thai_hien_tai').on('value', s => {
-        const d = s.val(); if(!d) return;
-        document.getElementById('wA').style.height = (d.levelA || 0) + '%'; 
-        document.getElementById('vA').innerText = d.levelA || 0;
-        document.getElementById('wB').style.height = (d.levelB || 0) + '%'; 
-        document.getElementById('vB').innerText = d.levelB || 0;
-        document.getElementById('wC').style.height = (d.levelC || 0) + '%'; 
-        document.getElementById('vC').innerText = d.levelC || 0;
+        const d = s.val() || {levelA:0, levelB:0, levelC:0};
+        document.getElementById('wA').style.height = d.levelA + '%'; document.getElementById('tA').innerText = d.levelA;
+        document.getElementById('wB').style.height = d.levelB + '%'; document.getElementById('tB').innerText = d.levelB;
+        document.getElementById('wC').style.height = d.levelC + '%'; document.getElementById('tC').innerText = d.levelC;
     });
 
-    // 2. Lấy danh sách lịch sử và cập nhật bảng
+    // 2. Lấy lịch sử và xử lý thời gian thông minh
     db.ref('lich_su_tron').on('value', s => {
-        const logs = s.val(); const body = document.getElementById('log-body');
-        body.innerHTML = ""; excelData = [];
-        if(!logs) {
-            body.innerHTML = "<tr><td colspan='4'>Chưa có dữ liệu lịch sử</td></tr>";
-            return;
-        }
-        Object.keys(logs).reverse().forEach(k => {
-            const row = logs[k];
-            let d = new Date(row.thoi_gian * 1000);
-            if(d.getFullYear() < 2024) d = new Date(); // Sửa lỗi thời gian ESP32
-            const timeStr = d.toLocaleString('vi-VN');
-            
-            excelData.push({
-                "Thời gian": timeStr, 
-                "Bình A (%)": row.binh_A_percent, 
-                "Bình B (%)": row.binh_B_percent,
-                "Trạng thái": row.trang_thai
-            });
+        const data = s.val();
+        const tbody = document.getElementById('history');
+        tbody.innerHTML = "";
+        logs = [];
+        if(!data) return;
 
-            body.innerHTML += `<tr>
-                <td>${timeStr}</td>
-                <td>${row.binh_A_percent}%</td>
-                <td>${row.binh_B_percent}%</td>
-                <td><span class="status">${row.trang_thai}</span></td>
-            </tr>`;
+        Object.keys(data).reverse().forEach(id => {
+            const item = data[id];
+            let timeDisplay = "";
+
+            // LOGIC XỬ LÝ THỜI GIAN THÔNG MINH
+            if (typeof item.thoi_gian === 'string' && item.thoi_gian.includes('/')) {
+                // Nếu là dạng chuỗi "18/12/2025..." gửi từ ESP32
+                timeDisplay = item.thoi_gian;
+            } else if (typeof item.thoi_gian === 'number' || !isNaN(item.thoi_gian)) {
+                // Nếu là dạng số Unix timestamp
+                const d = new Date(item.thoi_gian * 1000);
+                timeDisplay = d.toLocaleString('vi-VN');
+            } else {
+                timeDisplay = "Không rõ thời gian";
+            }
+
+            // Chặn các ngày lỗi 1970
+            if (timeDisplay.includes("1970")) timeDisplay = "Lỗi đồng bộ mạch";
+
+            logs.push({ "Thời gian": timeDisplay, "A": item.binh_A_percent, "B": item.binh_B_percent });
+            tbody.innerHTML += `<tr><td>${timeDisplay}</td><td>${item.binh_A_percent}%</td><td>${item.binh_B_percent}%</td><td><span class="status">Hoàn thành</span></td></tr>`;
         });
     });
 
-    // 3. Hàm kích hoạt trộn từ xa
-    function remoteMix() {
-        db.ref('dieu_khien').set({lenh_tron: 1});
-        alert("Đã gửi lệnh kích hoạt đến ESP32!");
-    }
-    
-    // 4. Hàm xuất Excel
-    function exportData() {
-        if(excelData.length === 0) return alert("Không có dữ liệu!");
-        const ws = XLSX.utils.json_to_sheet(excelData);
+    function mix() { db.ref('dieu_khien').update({ lenh_tron: 1 }); alert("Đã gửi lệnh!"); }
+    function clearData() { if(confirm("Xóa sạch lịch sử?")) db.ref('lich_su_tron').remove(); }
+    function exportExcel() {
+        const ws = XLSX.utils.json_to_sheet(logs);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Lịch sử");
-        XLSX.writeFile(wb, "Bao_cao_tron_dung_dich.xlsx");
-    }
-
-    // 5. Hàm XÓA LỊCH SỬ (Mới thêm)
-    function clearHistory() {
-        if(confirm("CẢNH BÁO: Bạn có chắc chắn muốn xóa toàn bộ dữ liệu lịch sử không? Hành động này không thể hoàn tác.")) {
-            db.ref('lich_su_tron').remove()
-            .then(() => alert("Đã xóa sạch lịch sử thành công!"))
-            .catch(err => alert("Lỗi khi xóa: " + err));
-        }
+        XLSX.writeFile(wb, "Bao_cao_tram_tron.xlsx");
     }
 </script>
 </body>
